@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CodexとClaude Codeの残り利用枠を、Macのメニューバーに。QuotaBarのダウンロードと使い方。">
+  <meta name="theme-color" content="#f5f6f2">
+  <title>QuotaBar — 利用枠を、ひと目で。</title>
+  <style>
+    :root { color-scheme: light; --ink:#202a26; --muted:#5e6a63; --green:#27634c; --line:#dce2d9; --paper:#f5f6f2; --orange:#ac6248; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; scroll-padding-top:95px; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; font-size:15px; line-height:1.85; -webkit-font-smoothing:antialiased; }
+    a { color:var(--green); text-underline-offset:4px; }
+    a:hover { text-decoration:underline; }
+    a:focus-visible, summary:focus-visible { outline:3px solid var(--green); outline-offset:5px; }
+    .wrap { max-width:1056px; margin:auto; padding:0 32px; }
+    .top { position:sticky; top:0; z-index:3; background:#f5f6f2f2; border-bottom:1px solid var(--line); backdrop-filter:blur(14px); }
+    .nav { display:flex; justify-content:space-between; align-items:center; min-height:74px; gap:24px; }
+    .brand { display:flex; align-items:center; gap:12px; color:var(--ink); text-decoration:none; font-size:20px; font-weight:700; letter-spacing:-.5px; }
+    .brand svg { width:34px; height:34px; }
+    nav { display:flex; gap:25px; align-items:center; font-size:13px; }
+    nav a { text-decoration:none; color:var(--muted); }
+    .hero { padding:78px 0 58px; display:grid; grid-template-columns:1.15fr 1fr; gap:50px; align-items:center; }
+    .eyebrow { font-size:11px; letter-spacing:2px; font-weight:700; color:var(--green); margin:0 0 20px; }
+    h1 { font-size:clamp(36px,4.4vw,52px); letter-spacing:-2px; line-height:1.35; margin:0 0 24px; font-weight:700; }
+    .intro { color:var(--muted); max-width:450px; margin:0 0 26px; }
+    .download { display:inline-flex; justify-content:center; align-items:center; gap:12px; min-height:50px; padding:11px 22px; border-radius:10px; background:var(--green); color:white; text-decoration:none; font-weight:600; font-size:14px; }
+    .download:hover { background:#1c4e3a; text-decoration:none; }
+    .meta { font-size:11px; color:var(--muted); margin:12px 0 0; }
+    .preview { padding:23px 21px 20px; background:#e7eae1; border:1px solid #d7dfd3; border-radius:24px; }
+    .samplebar { display:flex; align-items:center; justify-content:flex-end; gap:17px; padding:0 2px 17px; font-size:12px; font-weight:600; }
+    .sampleitem { display:flex; align-items:center; gap:7px; }
+    .mini { display:inline-block; width:24px; height:11px; border:1px solid currentColor; border-radius:3px; position:relative; }
+    .mini:before { content:""; position:absolute; inset:2px; background:currentColor; width:var(--charge,70%); border-radius:1px; }
+    .mini:after { content:""; position:absolute; right:-3px; top:3px; width:2px; height:3px; background:currentColor; border-radius:1px; }
+    .panel { padding:19px; background:#fafbf8; border:1px solid #fff; border-radius:17px; box-shadow:0 16px 35px #293d2920; }
+    .panelhead { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:13px; }
+    .sampletag { border:1px solid var(--line); border-radius:5px; padding:1px 7px; color:var(--muted); font-size:10px; font-weight:400; }
+    .segments { display:flex; justify-content:space-around; background:#edf0e9; padding:3px; border-radius:7px; margin-bottom:12px; color:var(--muted); font-size:10px; }
+    .segments span { width:33.333%; text-align:center; padding:2px 0; }
+    .segments .selected { color:var(--ink); background:white; border-radius:5px; box-shadow:0 1px 3px #00000012; }
+    .samplecard { padding:12px 13px; background:white; border:1px solid #e9ece5; border-radius:11px; margin-bottom:8px; }
+    .samplehead { display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; font-size:12px; }
+    .samplehead b { font-size:23px; letter-spacing:-1px; line-height:1; }
+    .samplehead small { font-size:11px; }
+    .codex { color:var(--green); } .claude { color:var(--orange); }
+    .meterrow { display:grid; grid-template-columns:34px 1fr 28px; gap:8px; align-items:center; margin:5px 0; font-size:9px; color:var(--muted); }
+    .track { height:4px; border-radius:5px; background:#edf0e9; overflow:hidden; }
+    .fill { display:block; height:100%; background:var(--green); border-radius:5px; }
+    .claude .fill { background:var(--orange); }
+    .panelfoot { display:flex; justify-content:space-between; padding-top:7px; color:var(--muted); font-size:9px; }
+    .previewnote { margin:12px 0 0; text-align:center; color:var(--muted); font-size:10px; }
+    .notice { background:#f3eddf; border:1px solid #e4d8be; border-radius:12px; padding:20px 24px; margin-bottom:54px; font-size:12px; color:#665238; }
+    .notice strong { display:block; color:#4d3e2b; font-size:13px; margin-bottom:7px; }
+    .notice p { margin:5px 0; }
+    .notice a { color:inherit; }
+    section.guide { padding:38px 0 47px; border-top:1px solid var(--line); }
+    .sectionhead { display:flex; gap:17px; align-items:baseline; margin-bottom:25px; }
+    .sectionnum { font-size:12px; font-weight:600; color:var(--green); letter-spacing:1px; }
+    h2 { font-size:25px; line-height:1.5; letter-spacing:-.5px; margin:0; }
+    h3 { font-size:16px; margin:0 0 10px; }
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .step { padding-right:12px; }
+    .stepnum { display:block; width:29px; height:29px; line-height:29px; text-align:center; background:#e4ebe1; color:var(--green); font-size:12px; border-radius:50%; margin-bottom:15px; }
+    p { margin:0 0 12px; }
+    .step p,.connect p { color:var(--muted); font-size:13px; }
+    .hint { margin-top:24px; padding:14px 18px; border-left:3px solid #bdcbb8; background:#edf0e8; font-size:12px; color:var(--muted); }
+    .connectgrid { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+    .connect { background:#fcfdf9; border:1px solid var(--line); border-radius:13px; padding:24px; }
+    .connect h3 { display:flex; align-items:center; gap:10px; margin-bottom:17px; }
+    .symbol { display:inline-flex; justify-content:center; align-items:center; width:31px; height:31px; border-radius:8px; background:#e8eee3; font-size:16px; }
+    .claude .symbol { background:#f4e7df; }
+    ol { padding-left:21px; margin:0; }
+    li { margin-bottom:11px; font-size:13px; }
+    li:last-child { margin-bottom:0; }
+    code { padding:2px 6px; background:#e9ede5; border-radius:4px; font-family:ui-monospace,SFMono-Regular,monospace; font-size:.9em; overflow-wrap:anywhere; }
+    .small { font-size:12px; color:var(--muted); margin-top:18px; }
+    .tablewrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:13px; text-align:left; }
+    th,td { padding:14px 16px; border-bottom:1px solid var(--line); vertical-align:top; }
+    thead th { color:var(--muted); font-size:11px; font-weight:500; padding-top:0; }
+    tbody th { width:170px; font-weight:600; }
+    td { color:var(--muted); }
+    .tips { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:28px; }
+    .tips h3 { font-size:14px; } .tips p { font-size:13px; color:var(--muted); }
+    kbd { display:inline-block; border:1px solid #cbd5c5; border-bottom-width:2px; border-radius:4px; padding:0 6px; font:inherit; font-size:12px; background:#fff; }
+    details { border-bottom:1px solid var(--line); padding:17px 0; }
+    summary { font-size:14px; font-weight:600; cursor:pointer; }
+    details p { margin:12px 0 0; font-size:13px; color:var(--muted); max-width:850px; }
+    .closing { padding:33px 0; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; gap:20px; border-top:1px solid var(--line); }
+    .closing a { color:inherit; }
+    @media(max-width:760px) { .wrap { padding:0 22px; } .nav { min-height:65px; gap:10px; } nav { gap:16px; font-size:12px; } .hero { grid-template-columns:1fr; gap:32px; padding:44px 0 32px; } h1 { font-size:40px; } .intro { max-width:none; } .preview { max-width:430px; width:100%; margin:auto; } .notice { margin-bottom:32px; padding:18px; } .steps { grid-template-columns:1fr; gap:22px; } .step { padding:0; } .stepnum { float:left; margin:0 12px 0 0; } .step h3,.step p { margin-left:41px; } .connectgrid,.tips { grid-template-columns:1fr; } .connect { padding:21px; } h2 { font-size:22px; } tbody th { width:102px; } th,td { padding:13px 8px; } .closing { flex-direction:column; gap:9px; } }
+    @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+    @media print { .top { position:static; } .download,nav,.preview { display:none; } .hero { display:block; padding:25px 0; } body { background:white; font-size:12px; } .wrap { max-width:none; } details { break-inside:avoid; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="QuotaBar トップへ">
+        <svg viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="10" fill="#27382e"/><rect x="7" y="11" width="21" height="14" rx="3" fill="none" stroke="#e8eee3" stroke-width="1.5"/><rect x="10" y="14" width="8" height="8" rx="1" fill="#8db797"/><rect x="20" y="14" width="5" height="8" rx="1" fill="#d29a79"/><path d="M30 15v6" stroke="#e8eee3" stroke-width="2"/></svg>
+        QuotaBar
+      </a>
+      <nav aria-label="ページ内ナビゲーション"><a href="#install">使い方</a><a href="#faq">FAQ</a><a href="https://github.com/adachic/QuotaBar">GitHub ↗</a></nav>
+    </div>
+  </header>
+  <main id="top" class="wrap">
+    <div class="hero">
+      <div>
+        <p class="eyebrow">A LITTLE UTILITY FOR YOUR MAC</p>
+        <h1>利用枠を、<br>ひと目で。</h1>
+        <p class="intro">CodexとClaude Codeの残り利用枠を、<br>Macのメニューバーに。電池の残量を見るように、いつもの場所で確認できます。</p>
+        <a class="download" href="https://github.com/adachic/QuotaBar/releases/download/v1.0.1/QuotaBar-1.0.1-arm64.dmg"><span aria-hidden="true">↓</span> DMGをダウンロード</a>
+        <p class="meta">v1.0.1 · 試用版 · macOS 14以降 · Apple Silicon専用</p>
+        <p class="meta">Developer ID署名・Apple公証なし。<a href="#notes">ダウンロード前の注意点</a></p>
+      </div>
+      <div class="preview" role="img" aria-label="表示イメージ。Codexは残り72％、Claude Codeは残り85％。いずれも架空のサンプル値です。">
+        <div class="samplebar"><span class="sampleitem">&lt;/&gt; <i class="mini" style="--charge:60%"></i> 72%</span><span class="sampleitem">✳ <i class="mini" style="--charge:70%"></i> 85%</span><span>9:41</span></div>
+        <div class="panel">
+          <div class="panelhead"><strong>QuotaBar</strong><span class="sampletag">表示イメージ</span></div>
+          <div class="segments"><span>5時間</span><span>週間</span><span class="selected">少ない方</span></div>
+          <div class="samplecard codex"><div class="samplehead"><strong>&lt;/&gt; &nbsp; Codex</strong><b>72<small> %</small></b></div><div class="meterrow"><span>5時間</span><div class="track"><i class="fill" style="width:88%"></i></div><span>88%</span></div><div class="meterrow"><span>週間</span><div class="track"><i class="fill" style="width:72%"></i></div><span>72%</span></div></div>
+          <div class="samplecard claude"><div class="samplehead"><strong>✳ &nbsp; Claude Code</strong><b>85<small> %</small></b></div><div class="meterrow"><span>5時間</span><div class="track"><i class="fill" style="width:85%"></i></div><span>85%</span></div><div class="meterrow"><span>週間</span><div class="track"><i class="fill" style="width:96%"></i></div><span>96%</span></div></div>
+          <div class="panelfoot"><span>● &nbsp; 3分ごとに自動更新</span><span>⚙ &nbsp; ⏻</span></div>
+        </div>
+        <p class="previewnote">数値はサンプルです。実際の利用状況ではありません。</p>
+      </div>
+    </div>
+    <aside class="notice" id="notes" aria-label="ダウンロード前の注意点">
+      <strong>試用版として公開しています</strong>
+      <p>この配布版はアドホック署名で、Developer ID署名・Apple公証はありません。初回起動がmacOSにブロックされる場合があります。<a href="https://support.apple.com/ja-jp/102445">Appleの案内</a></p>
+      <p>Claude連携は、保存済みOAuth認証情報と非公開の利用状況エンドポイントを使用します。Anthropicの第三者アプリによる認証情報の取り扱い制限に照らし、この用途が許容されるかは未確認です。動作継続や利用条件への適合を保証するものではありません。<a href="https://code.claude.com/docs/en/legal-and-compliance">Anthropicの利用条件</a></p>
+    </aside>
+    <section class="guide" id="install">
+      <div class="sectionhead"><span class="sectionnum">01</span><h2>Macに入れる</h2></div>
+      <div class="steps">
+        <div class="step"><span class="stepnum">1</span><h3>DMGを開く</h3><p>上のボタンからダウンロードした <code>QuotaBar-1.0.1-arm64.dmg</code> をダブルクリックします。Intel Macはこの配布版の対象外です。</p></div>
+        <div class="step"><span class="stepnum">2</span><h3>Applicationsへ移動</h3><p>DMG内の <code>QuotaBar.app</code> を、隣の <code>Applications</code> フォルダへドラッグしてコピーします。</p></div>
+        <div class="step"><span class="stepnum">3</span><h3>アプリを起動</h3><p>「アプリケーション」からQuotaBarを開きます。画面上部に2つのゲージが出れば起動完了。Dockには表示されません。DMGは取り出して構いません。</p></div>
+      </div>
+      <p class="hint">開発元を確認できないという警告が出た場合：配布元と内容を確認し、起動すると判断した場合のみ「システム設定」→「プライバシーとセキュリティ」→「このまま開く」を選択します。詳しくは<a href="https://support.apple.com/ja-jp/102445">Appleの案内</a>をご覧ください。</p>
+    </section>
+    <section class="guide" id="connect">
+      <div class="sectionhead"><span class="sectionnum">02</span><h2>アカウントに接続する</h2></div>
+      <div class="connectgrid">
+        <article class="connect"><h3 class="codex"><span class="symbol">&lt;/&gt;</span>Codex</h3><ol><li>Codex CLIをインストールし、ChatGPTアカウントでログインしておきます。</li><li>QuotaBarがCLIを自動検出し、利用枠を取得します。</li><li>見つからない場合は、QuotaBarの歯車からCodexの実行ファイルを選び、更新ボタンを押します。</li></ol><p class="small">APIキーだけの利用には対応していません。<a href="https://developers.openai.com/codex/cli/">Codex CLIの公式案内 ↗</a></p></article>
+        <article class="connect"><h3 class="claude"><span class="symbol">✳</span>Claude Code</h3><ol><li>Claude Codeをインストールし、<code>/login</code> でClaudeアカウントにログインしておきます。</li><li>QuotaBarの歯車を開き、「Claude Codeに接続」をクリックします。</li><li>キーチェーンのアクセス許可が求められたら、内容を確認して許可します。</li></ol><p class="small">APIキーだけの利用には対応していません。接続方式の制約は<a href="#notes">ダウンロード前の注意点</a>をご確認ください。</p></article>
+      </div>
+      <p class="small">QuotaBarにパスワードやAPIキーを入力する必要はありません。利用枠がサービスから提供されるアカウントが必要です。</p>
+    </section>
+    <section class="guide" id="usage">
+      <div class="sectionhead"><span class="sectionnum">03</span><h2>残量を見る・使いやすくする</h2></div>
+      <p class="small" style="margin:0 0 22px">メニューバーのどちらのゲージをクリックしても、両サービスの詳細が開きます。初期設定は「少ない方」、更新間隔は3分です。</p>
+      <div class="tablewrap"><table><thead><tr><th scope="col">表示・設定</th><th scope="col">意味と操作</th></tr></thead><tbody>
+        <tr><th scope="row">5時間 / 週間</th><td>メニューバーに表示する枠を切り替えます。「少ない方」は取得できた2つの枠のうち、残りが少ない枠を表示します。</td></tr>
+        <tr><th scope="row">残りの％</th><td>100 − 使用率。小数点以下は切り捨てます。詳細パネルでは20％以下でオレンジ、10％以下で赤になります。</td></tr>
+        <tr><th scope="row">「—」</th><td>値が取得できない、またはアカウントにその枠が提供されていません。残量ゼロという意味ではありません。</td></tr>
+        <tr><th scope="row">前回の値 /「·」</th><td>再取得に失敗した場合などの古い値です。接続状態を確認し、更新ボタンで再取得してください。</td></tr>
+        <tr><th scope="row">リセット確認待ち</th><td>リセット予定時刻を過ぎたため、最新の残量が取得できるまで待機しています。</td></tr>
+        <tr><th scope="row">歯車の設定</th><td>％の表示、更新間隔（1・3・5・15分）、Macへのログイン時の自動起動を変更できます。</td></tr>
+      </tbody></table></div>
+      <div class="tips"><div><h3>好きな位置に並べる</h3><p><kbd>⌘ Command</kbd> を押しながらアイコンを左右にドラッグ。CodexとClaudeをそれぞれ移動できます。％をオフにすると表示の幅を抑えられます。</p></div><div><h3>終了・アンインストール</h3><p>詳細パネルの電源ボタンで終了できます。削除する場合は「ログイン時に起動」をオフにし、終了してからアプリをゴミ箱へ移動してください。</p></div></div>
+    </section>
+    <section class="guide" id="faq">
+      <div class="sectionhead"><span class="sectionnum">04</span><h2>よくある質問</h2></div>
+      <details><summary>CodexやClaude Codeの画面を閉じても更新されますか？</summary><p>QuotaBarが起動していてMacがスリープしていなければ、各アプリの画面を開いておく必要はありません。Codex CLIのインストール、有効なログイン情報、ネットワーク接続は必要です。期限切れの場合は元のアプリでログインし直してください。</p></details>
+      <details><summary>画面を読み取っているのですか？</summary><p>画面のスクレイピングは行いません。CodexはローカルCLIのApp Server経由で、Claude Codeは利用状況エンドポイントから取得します。<a href="https://github.com/adachic/QuotaBar#接続方法">接続方法の詳細</a>も公開しています。</p></details>
+      <details><summary>認証情報や利用状況はどこに送られますか？</summary><p>開発者のサーバーには送信しません。Codexはインストール済みCLIに通信を任せます。Claudeのトークンはメモリで扱い、Anthropicの固定HTTPS宛先にのみ送信し、QuotaBarのログ・設定・キャッシュには保存しません。キーチェーン項目が存在しない場合のみ、Claude Code自身の認証ファイルを読みます。Codex CLIが自身の状態やログを更新することはあります。</p></details>
+      <details><summary>接続エラーや更新されない表示を直すには？</summary><p>まずネットワーク接続と、Codex／Claude Code側でログインできることを確認してください。その後、QuotaBarで再接続・更新します。アクセス制限（429）の場合は指定された待ち時間が終わってから再試行します。Claude側の仕様変更によって取得できなくなる場合もあります。</p></details>
+      <details><summary>アプリを更新するには？</summary><p>QuotaBarを終了して、新しいDMG内のアプリで「アプリケーション」のQuotaBarを置き換えてください。自動更新機能はありません。<a href="https://github.com/adachic/QuotaBar/releases">リリース一覧</a>で更新を確認できます。</p></details>
+      <details><summary>不具合を報告するには？</summary><p><a href="https://github.com/adachic/QuotaBar/issues">GitHub Issues</a>へ、macOSのバージョンと再現手順をお知らせください。認証ファイル、アクセストークン、APIキーは添付しないでください。</p></details>
+    </section>
+  </main>
+  <footer class="wrap closing"><span>QuotaBar · by <a href="https://github.com/adachic">adachic</a></span><span>OpenAI・Anthropicの公式アプリではありません。 · <a href="https://github.com/adachic/QuotaBar/releases/tag/v1.0.1">v1.0.1 / リリース情報 ↗</a></span></footer>
+</body>
+</html>

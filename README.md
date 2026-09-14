@@ -4,7 +4,15 @@ CodexとClaude Codeの残り利用枠を、macOSのメニューバーに電池�
 
 ## 起動
 
-GitHubにはソースコードを掲載しています。最初に次のコマンドでアプリをビルドできます。
+**[ダウンロードと使い方](https://adachic.github.io/QuotaBar/)** · **[DMG（v1.0.1・Apple Silicon）](https://github.com/adachic/QuotaBar/releases/download/v1.0.1/QuotaBar-1.0.1-arm64.dmg)** · [リリース情報](https://github.com/adachic/QuotaBar/releases/tag/v1.0.1)
+
+公開DMGはmacOS 14以降・Apple Silicon向けの試用版です。Developer ID署名・Apple公証はなく、初回起動がブロックされる場合があります。配布元と内容を確認したうえで、[Appleの案内](https://support.apple.com/ja-jp/102445)に従ってください。
+
+**Claude連携の利用条件は未確認です。** 保存済みOAuth認証情報を使う現在の方式が、Anthropicの第三者アプリによる認証情報の取り扱い制限の下で許容されるかは確認できていません。[Anthropicの利用条件](https://code.claude.com/docs/en/legal-and-compliance)をご確認ください。
+
+DMGを開き、`QuotaBar.app` を `Applications` へドラッグしてから「アプリケーション」で起動してください。DMGにはオフラインでも読める `使い方.html` を同梱しています。
+
+ソースコードからビルドする場合:
 
 ```bash
 git clone https://github.com/adachic/QuotaBar.git
@@ -68,7 +76,7 @@ Claude Codeには公式の[ステータスライン用利用率データ](https:
 
 - macOS 14以降、Swift 5.10以降／Xcode Command Line Tools
 - 今回のビルド: Apple Silicon（arm64）
-- 同梱アプリはローカル利用向けのアドホック署名です。Developer ID署名・Apple公証は含みません。
+- 配布アプリはアドホック署名の試用版です。Developer ID署名・Apple公証は含みません。
 - ローカルのキーチェーンとCLIを利用するため、App Sandboxは有効にしていません。
 
 ```bash
@@ -82,6 +90,14 @@ open dist/QuotaBar.app
 ```bash
 QUOTABAR_BUILD_DIR=/tmp/quotabar-build bash scripts/build.sh /tmp/quotabar-output
 ```
+
+DMGとSHA-256チェックサムを作成する場合:
+
+```bash
+bash scripts/package-dmg.sh dist/QuotaBar.app dist
+```
+
+`docs/index.html` がGitHub Pagesの説明書とDMG同梱の説明書を兼ねます。外部スクリプト・フォント・解析ツールを使わない単一HTMLです。GitHub Pagesは `main` ブランチの `/docs` から公開します。
 
 取得確認用のコマンドは、トークンやアカウント識別子を出力しません。残量と日時だけを出力します。
 
@@ -105,6 +121,8 @@ open dist/QuotaBar.app --args --demo
 - `Sources/QuotaBar`: メニューバー、SwiftUIパネル、更新と設定
 - `Tests/QuotaCoreTests`: 残量計算、欠損・期限切れ、週間枠のみのアカウント、認証データ、429、通信処理
 - `scripts/build.sh`: `.app` の作成とアドホック署名
+- `scripts/package-dmg.sh`: DMG、同梱説明書、SHA-256チェックサムの作成
+- `docs/index.html`: GitHub PagesとDMGに共通の使い方ガイド
 - `Resources`: アプリアイコン、Info.plist
 
 ## アンインストール
